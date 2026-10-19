@@ -34,11 +34,13 @@ Build a small smart-hotel web application with a Node.js and Express backend, a 
 ```bash
 npm install
 npm start
-```
+
 
 Then I can run with 2 options: 
+```bash
 - node server.js
 - npm start (the real one, the og, the other is the translation defined in package.json)
+```
 
 It loos like:
 
