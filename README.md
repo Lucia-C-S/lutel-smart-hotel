@@ -34,6 +34,7 @@ Build a small smart-hotel web application with a Node.js and Express backend, a 
 ```bash
 npm install
 npm start
+```
 
 
 Then I can run with 2 options: 
