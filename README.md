@@ -46,6 +46,7 @@ Then I can run with 2 options:
 It loos like:
 
 PS C:\Users\lucia\sint\sint-p2-lucia-c-s-main> node server.js
+
 P2 smart-hotel app running at http://localhost:3000/
 
 ## DOCUMENTATION
