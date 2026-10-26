@@ -143,7 +143,8 @@ if (page === 'alarms') {
     message.className = 'error';
     message.hidden = false;
   }
-  //TODO
+  
+  //TODOooooooooooooooooooooooo
   const alarmCreation = document.getElementById('alarm-creation');
   deviceForm.addEventListener('submit', async event => {
     event.preventDefault();
