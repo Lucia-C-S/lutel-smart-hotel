@@ -9,7 +9,8 @@
   </head>
   <body data-page="devices">
     <nav>
-      <a href="/rooms.html">devices</a>
+      <a href="/index.html">Main page</a>
+      <a href="/rooms.html">Rooms</a>
       <a href="/devices.html">Devices</a>
       <a href="/alarms.html">Alarms</a>
     </nav>
@@ -25,13 +26,13 @@
         <h2 id="create-device-heading">Create a device</h2>
         <form id="devices-form">
           <label for="device-id">Device ID</label>
-          <input id="device" name="id" required placeholder="dev-001">
-          <label for="device">Room ID</label>
+          <input id="device" name="id" step="1" required placeholder="dev-001">
+          <label for="room-id">Room ID</label>
           <input id="room-id" name="roomId" type="number" required placeholder="203">
           <label for="device-type">Type</label>
           <input id="device-type" name="type" required placeholder="temperature">
           <label for="device-label">Label</label>
-          <input id="device-label" name="label"  step="1" required placeholder="Temperaturesensor203">
+          <input id="device-label" name="label" required placeholder="Temperaturesensor203">
           <button type="submit">Create device</button>
         </form>
       </section>
