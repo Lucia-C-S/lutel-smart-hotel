@@ -24,7 +24,7 @@ Build a small smart-hotel web application with a Node.js and Express backend, a 
 ## Required frontend actions
 
 - List and create rooms.
-- List and create devices assigned to rooms.
+- Browse devices by room and floor, view device details, create devices, and delete individual devices.
 - Submit telemetry readings.
 - List alarms.
 - Acknowledge alarms.
@@ -58,7 +58,11 @@ Document the port, alarm thresholds, endpoints, and assumptions here.
 
 ## Alarm thresholds
 
-TODO
+- Temperature sensor: 26 °C or higher.
+- Humidity: 75% or higher.
+- CO₂: 1,000 ppm or higher.
+- Noise: 65 dB(A) or higher.
+- Panic button and alarm button: a reading of `1` triggers an alarm when the corresponding button is active.
 
 ## Assumptions
 

@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "alarmId": "alarm-d01a089b-1093-46d4-809e-e0c7450be590",
+    "deviceId": "alarmbutton1",
+    "type": "alarm-button",
+    "message": "Alarm button activated.",
+    "timestamp": "2026-11-07T16:12:52.458Z",
+    "acknowledged": true
+  },
+  {
+    "alarmId": "alarm-0ac56376-b473-4d28-873f-f376ac48e116",
+    "deviceId": "dev-1",
+    "type": "high-noise",
+    "message": "Noise 75 dB(A) meets or exceeds the 65 dB(A) threshold.",
+    "timestamp": "2026-11-07T17:45:12.557Z",
+    "acknowledged": true
+  },
+  {
+    "alarmId": "alarm-db8fa05c-d832-4a98-90e1-c8d8c80453a2",
+    "deviceId": "dev",
+    "type": "high-noise",
+    "message": "Noise 70 dB(A) meets or exceeds the 65 dB(A) threshold.",
+    "timestamp": "2026-11-07T18:23:56.363Z",
+    "acknowledged": true
+  }
+]

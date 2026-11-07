@@ -18,21 +18,68 @@
       <h1>Devices</h1>
       <p id="message" hidden></p>
       <section>
-        <h2 id="device-list-heading">Device list</h2>
+        <h2>Rooms by floor</h2>
+        <p>Hover over or select a room to see its devices.</p>
         <button id="refresh" type="button">Refresh</button>
-        <ul id="devices-list"><li>Loading devices...</li></ul>
+        <div class="device-workspace">
+          <div id="floor-plan" aria-live="polite">
+            <p>Loading rooms and devices...</p>
+          </div>
+          <section id="device-panel" class="device-panel" aria-live="polite" hidden>
+            <h2 id="selected-device-heading">Select a device</h2>
+            <div id="device-details" hidden></div>
+            <div class="device-actions" hidden>
+              <button id="show-reading-form" type="button">Record reading</button>
+              <button id="show-device-details" type="button">View details</button>
+              <button id="delete-device" class="danger-button" type="button">Delete device</button>
+            </div>
+            <form id="reading-form" hidden>
+              <h3>Record a reading</h3>
+              <label id="reading-value-label" for="reading-value">Value</label>
+              <input id="reading-value" name="value" type="number" step="any" required>
+              <select id="button-state" name="buttonState" required hidden>
+                <option value="false">Inactive</option>
+                <option value="true">Active</option>
+              </select>
+              <div class="reading-form-actions">
+                <button type="submit">Save reading</button>
+                <button id="cancel-reading" type="button">Cancel</button>
+              </div>
+            </form>
+          </section>
+        </div>
       </section>
+      <div id="delete-confirmation" class="device-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-confirmation-title" aria-describedby="delete-confirmation-message" hidden>
+        <div class="device-dialog-content">
+          <h2 id="delete-confirmation-title">Delete device?</h2>
+          <p id="delete-confirmation-message"></p>
+          <div class="device-dialog-actions">
+            <button id="confirm-delete-device" class="danger-button" type="button">Delete device</button>
+            <button id="cancel-delete-device" type="button">Cancel</button>
+          </div>
+        </div>
+      </div>
       <section>
-        <h2 id="create-device-heading">Create a device</h2>
+        <h2>Create a device</h2>
         <form id="devices-form">
           <label for="device-id">Device ID</label>
-          <input id="device" name="id" step="1" required placeholder="dev-001">
-          <label for="room-id">Room ID</label>
-          <input id="room-id" name="roomId" type="number" required placeholder="203">
+          <input id="device-id" name="id" required placeholder="dev-001">
+          <label for="room-id">Room</label>
+          <select id="room-id" name="roomId" required>
+            <option value="">Select a room</option>
+          </select>
           <label for="device-type">Type</label>
-          <input id="device-type" name="type" required placeholder="temperature">
+          <select id="device-type" name="type" required>
+            <option value="">Select a type</option>
+            <option value="temperature">Temperature sensor (°C)</option>
+            <option value="humidity">Humidity (%)</option>
+            <option value="co2">CO₂ (ppm)</option>
+            <option value="noise">Noise (dB(A))</option>
+            <option value="panic-button">Panic button (0/1)</option>
+            <option value="alarm-button">Alarm button (0/1)</option>
+          </select>
           <label for="device-label">Label</label>
-          <input id="device-label" name="label" required placeholder="Temperaturesensor203">
+          <input id="device-label" name="label" required placeholder="Temperature sensor 203">
           <button type="submit">Create device</button>
         </form>
       </section>

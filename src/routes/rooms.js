@@ -1,24 +1,21 @@
 import { Router } from "express";
-import { listRooms } from "../services/roomStore.js"
+import { addRoom, getRoom, listRooms } from "../services/roomStore.js";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  try{
-    const rooms = await listRooms();
-    res.json(rooms)
-  }catch{
-    res.status(500).json({error: "Could not load room"})
-  };
-});
-
-
-      // `TODO: implement POST /devices for ${roomId}, ${floor}, ${type}`);
-router.post("/", async (req, res) => {
   try {
     const rooms = await listRooms();
-    const { id, floor, type } = req.body ?? {};
+    res.json(rooms);
+  } catch (error) {
+    console.error("Could not load rooms:", error);
+    res.status(500).json({ error: "Could not load rooms" });
+  }
+});
 
+router.post("/", async (req, res) => {
+  try {
+    const { id, floor, type } = req.body ?? {};
     const roomId = typeof id === "string" ? id.trim() : "";
     const roomType = typeof type === "string" ? type.trim() : "";
 
@@ -28,38 +25,31 @@ router.post("/", async (req, res) => {
       });
     }
 
-    if (rooms.some((room) => room.id === roomId)) {
-      return res.status(409).json({ error: "A room with that id already exists" });
-    }
-
     const newRoom = { id: roomId, floor, type: roomType };
-    rooms.push(newRoom);
-
-    await writeJson(dataFile, rooms);
-
-    res
+    await addRoom(newRoom);
+    return res
       .location(`/api/rooms/${encodeURIComponent(roomId)}`)
       .status(201)
       .json(newRoom);
   } catch (error) {
-    next(error);
+    const status = error.statusCode ?? 500;
+    if (status === 500) console.error("Could not create room:", error);
+    return res.status(status).json({
+      error: status === 500 ? "Could not create room" : error.message,
+    });
   }
 });
 
-
 router.get("/:roomId", async (req, res) => {
-  //res.status(501).json({ error: "TODO: get room" });
   try {
-    const rooms = await listRooms();
-    const room = rooms.find((item) => item.id === req.params.roomId);
-
+    const room = await getRoom(req.params.roomId);
     if (!room) {
       return res.status(404).json({ error: "Room not found" });
     }
-
     res.status(200).json(room);
   } catch (error) {
-    next(error);
+    console.error("Could not load room:", error);
+    res.status(500).json({ error: "Could not load room" });
   }
 });
 

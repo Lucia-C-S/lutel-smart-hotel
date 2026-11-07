@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=alarm-width, initial-scale=1">
-    <title>alarms - P2 Smart Hotel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alarms - P2 Smart Hotel</title>
     <link rel="stylesheet" href="/styles.css">
     <script type="module" src="/app.js"></script>
   </head>
@@ -18,30 +18,30 @@
       <h1>Alarms</h1>
       <p id="message" hidden></p>
       <section>
-        <h2 id="alarm-list-heading">Alarm list</h2>
-        <button id="refresh" type="button">Refresh</button>
-        <ul id="alarms-list"><li>Loading alarms...</li></ul>
-      </section>
-      <section>
-        <h2 id="create-alarm-heading">Create an alarm</h2>
-        <form id="alarms-form">
-          <label for="alarm-id">Alarm ID</label>
-          <input id="alarm" name="id" required placeholder="alarm-001">
-          <label for="device-id">Device ID</label>
-          <input id="device-id" name="deviceId" required placeholder="dev-001">
-          <label for="alarm-type">Type</label>
-          <input id="alarm-type" name="type" required placeholder="high-temperature">
-          <label for="alarm-message">Message</label>
-          <input id="alarm-message" name="message"  required placeholder="Temperature is above the allowed threshold.">
-          <label for="alarm-timestamp">Timestamp</label>
-          <input id="alarm-timestamp" name="timestamp"  required placeholder="2026-11-05T10:20:00.000Z">
-          <label for="alarm-ack">Acknowledged</label>
-          <input type="radio" id="alarm-ack" name="acknowledged" value="true">
-          <label for="true">True</label><br>
-          <input type="radio" id="alarm-ack" name="acknowledged" value="false">
-          <label for="false">False</label><br>
-          <button type="submit">Create alarm</button>
-        </form>
+        <div class="alarms-heading">
+          <div>
+            <h2 id="alarm-list-heading">Alarm history</h2>
+            <p>Alarms are generated automatically when a device reading crosses a threshold.</p>
+          </div>
+          <button id="refresh" type="button">Refresh</button>
+        </div>
+        <div class="table-container">
+          <table class="alarms-table">
+            <thead>
+              <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Alarm</th>
+                <th scope="col">Device</th>
+                <th scope="col">Room</th>
+                <th scope="col">Triggered</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="alarms-table-body">
+              <tr><td colspan="6">Loading alarms...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   </body>

@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "id": "dev",
+    "roomId": "102",
+    "type": "noise",
+    "label": "noise3"
+  }
+]
