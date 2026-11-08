@@ -5,18 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>P2 Smart Hotel</title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles/accordion-image/accordion-gallery.css">
+    <script type="module" src="/styles/accordion-image/accordion-image.js"></script>
   </head>
   <body>
     <nav>
-      <a href="/index.html">Main page</a>
+      <a href="/index.html" aria-current="page">Main page</a>
       <a href="/rooms.html">Rooms</a>
       <a href="/devices.html">Devices</a>
       <a href="/alarms.html">Alarms</a>
     </nav>
     <main>
-      <h1>P2 Smart Hotel</h1>
-      <p>Student: Lucía Castrillo Sánchez</p>
-      <p>Use the navigation bar to manage rooms, devices, readings and alarms.</p>
+      <header class="hero">
+        <p class="eyebrow">Student: Lucía Castrillo Sánchez</p>
+        <h1>P2 Smart Hotel</h1>
+        <p>Manage rooms, devices, readings and alarms from one quiet place.</p>
+      </header>
+      <div id="hotel-gallery" class="accordion-gallery" role="list" aria-label="Hotel image gallery"></div>
+      <div class="tile-grid">
+        <a href="/rooms.html"><strong>Rooms</strong>Create rooms and see them by floor.</a>
+        <a href="/devices.html"><strong>Devices</strong>Register sensors, record readings, remove devices.</a>
+        <a href="/alarms.html"><strong>Alarms</strong>Review triggered alarms and acknowledge them.</a>
+      </div>
     </main>
   </body>
 </html>

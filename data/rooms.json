@@ -1,6 +1,27 @@
 [
-{ "id": "101", "floor": 1, "type": "single" },
-{ "id": "102", "floor": 1, "type": "double" },
-{ "id": "201", "floor": 2, "type": "double" },
-{ "id": "202", "floor": 2, "type": "suite" }
+  {
+    "id": "101",
+    "floor": 1,
+    "type": "single"
+  },
+  {
+    "id": "102",
+    "floor": 1,
+    "type": "double"
+  },
+  {
+    "id": "201",
+    "floor": 2,
+    "type": "double"
+  },
+  {
+    "id": "202",
+    "floor": 2,
+    "type": "suite"
+  },
+  {
+    "id": "103",
+    "floor": 1,
+    "type": "single"
+  }
 ]

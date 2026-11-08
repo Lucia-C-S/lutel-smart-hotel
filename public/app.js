@@ -109,6 +109,7 @@ if (page === 'devices') {
   const selectedHeading = document.getElementById('selected-device-heading');
   const deviceActions = devicePanel.querySelector('.device-actions');
   const showDetailsButton = document.getElementById('show-device-details');
+  const cancelDetailsButton = document.getElementById('cancel-device-details');
   const readingForm = document.getElementById('reading-form');
   const readingValue = document.getElementById('reading-value');
   const buttonState = document.getElementById('button-state');
@@ -118,6 +119,7 @@ if (page === 'devices') {
   const confirmDeleteButton = document.getElementById('confirm-delete-device');
   const cancelDeleteButton = document.getElementById('cancel-delete-device');
   let selectedDevice = null;
+  let selectedDeviceButton = null;
   let returnToDetailsAfterReading = false;
 
   async function loadRoomsAndDevices() {
@@ -186,7 +188,7 @@ if (page === 'devices') {
             deviceButton.setAttribute('aria-haspopup', 'true');
             deviceButton.setAttribute('aria-expanded', 'false');
             deviceButton.textContent = `${device.label} (${device.type})`;
-            deviceButton.addEventListener('click', () => selectDevice(device));
+            deviceButton.addEventListener('click', () => selectDevice(device, deviceButton));
 
             const actionsMenu = document.createElement('div');
             actionsMenu.className = 'device-hover-actions';
@@ -203,7 +205,7 @@ if (page === 'devices') {
               if (actionId === 'delete-device') actionButton.className = 'danger-button';
               actionButton.addEventListener('click', () => {
                 deviceItem.classList.add('action-chosen');
-                selectDevice(device);
+                selectDevice(device, deviceButton);
                 document.getElementById(actionId).click();
                 deviceButton.focus();
               });
@@ -255,8 +257,9 @@ if (page === 'devices') {
     }
   }
 
-  function selectDevice(device) {
+  function selectDevice(device, triggerButton) {
     selectedDevice = device;
+    selectedDeviceButton = triggerButton;
     devicePanel.hidden = false;
     selectedHeading.textContent = device.label;
     deviceActions.hidden = false;
@@ -267,6 +270,20 @@ if (page === 'devices') {
     deleteConfirmation.hidden = true;
     hideMessage();
   }
+
+  cancelDetailsButton.addEventListener('click', () => {
+    const triggerButton = selectedDeviceButton;
+    triggerButton?.closest('.room-device-item')?.classList.remove('action-chosen');
+    selectedDevice = null;
+    selectedDeviceButton = null;
+    devicePanel.hidden = true;
+    deviceActions.hidden = true;
+    readingForm.hidden = true;
+    deviceDetails.hidden = true;
+    deviceDetails.replaceChildren(cancelDetailsButton);
+    returnToDetailsAfterReading = false;
+    triggerButton?.focus();
+  });
 
   try {
     await loadRoomsAndDevices();
@@ -343,6 +360,7 @@ if (page === 'devices') {
         emptyReadings.textContent = 'No readings recorded.';
         deviceDetails.append(emptyReadings);
       }
+      deviceDetails.append(cancelDetailsButton);
       readingForm.hidden = true;
       deviceDetails.hidden = false;
       deviceActions.hidden = false;
@@ -578,4 +596,59 @@ if (page === 'alarms') {
     alarmsTableBody.append(row);
     showMessage(error.message);
   }
+}
+
+// ---- UX additions (all pages) ----
+
+// Highlight the current page in the navigation bar.
+document.querySelector(`nav a[href="${location.pathname}"]`)?.setAttribute('aria-current', 'page');
+
+// Inline validation: show the browser's validation message under the field
+// instead of a pop-up bubble, and clear it as soon as the user edits the field.
+for (const form of document.forms) {
+  form.addEventListener('invalid', event => {
+    event.preventDefault(); // suppress the native bubble
+    const field = event.target;
+    if (!field.id) return;
+    let hint = document.getElementById(`${field.id}-error`);
+    if (!hint) {
+      hint = document.createElement('small');
+      hint.id = `${field.id}-error`;
+      hint.className = 'field-error';
+      field.after(hint);
+    }
+    hint.textContent = field.validationMessage;
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute('aria-describedby', hint.id);
+    // preventDefault also stops the automatic focus, so focus the first invalid field.
+    if (field === form.querySelector(':invalid')) field.focus();
+  }, true); // 'invalid' does not bubble, so listen in the capture phase
+
+  for (const type of ['input', 'change']) {
+    form.addEventListener(type, event => {
+      event.target.removeAttribute('aria-invalid');
+      document.getElementById(`${event.target.id}-error`)?.remove();
+    });
+  }
+}
+
+// Delete dialog: keep Tab inside the dialog and close it when the backdrop is clicked.
+const deleteDialog = document.getElementById('delete-confirmation');
+if (deleteDialog) {
+  deleteDialog.addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const buttons = [...deleteDialog.querySelectorAll('button')];
+    const first = buttons[0];
+    const last = buttons.at(-1);
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+  deleteDialog.addEventListener('click', event => {
+    if (event.target === deleteDialog) document.getElementById('cancel-delete-device').click();
+  });
 }

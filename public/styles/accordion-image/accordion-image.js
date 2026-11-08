@@ -1,235 +1,106 @@
-'use client';
+// Accordion image gallery, plain JavaScript version.
+// The original file was a React + GSAP component. This practice requires plain browser
+// JavaScript, so the motion lives in accordion-gallery.css (CSS transitions) and this file
+// only builds the panels and marks which one is active.
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { gsap } from 'gsap';
-
-import './AccordionGallery.css';
-
-const DEFAULT_ITEMS = [
-  { image: '/images/tarta.jpg', label: 'tarta', link: '#' },
-  { image: '/images/cama.jpg', label: 'cama1', link: '#' },
-  { image: '/images/vistas.jpg', label: 'cama2', link: '#' },
-  { image: '/images/sofa.jpg', label: 'sofa', link: '#' },
-  { image: '/images/spa.jpg', label: 'spa', link: '#' }
+// Edit this list to change the pictures and captions.
+const ITEMS = [
+  { image: '/styles/accordion-image/images/cama.jpeg', label: 'Suites' },
+  { image: '/styles/accordion-image/images/cama1.jpeg', label: 'Double rooms' },
+  { image: '/styles/accordion-image/images/cama2.jpeg', label: 'Twin rooms' },
+  { image: '/styles/accordion-image/images/vistas.jpeg', label: 'Views' },
+  { image: '/styles/accordion-image/images/sofa.jpeg', label: 'Lounge' },
+  { image: '/styles/accordion-image/images/spa.jpeg', label: 'Spa' },
+  { image: '/styles/accordion-image/images/tarta.jpeg', label: 'Patisserie' },
 ];
+const DEFAULT_INDEX = 3;   // panel open on page load
+const EXPAND_RATIO = 0.52; // share of the width taken by the open panel
+const TILT = 3;            // degrees of rotation on the closed panels
+const PARALLAX = 0.5;      // how far the photos slide inside closed panels
+const GAP = 10;            // pixels between panels
 
-const AccordionGallery = ({
-  items = DEFAULT_ITEMS,
-  defaultIndex = 2,
-  accentColor = '#ffffff',
-  overlayColor = '#060010',
-  textColor = '#ffffff',
-  height = 460,
-  gap = 10,
-  radius = 16,
-  expandRatio = 0.52,
-  orientation = 'horizontal',
-  duration = 0.6,
-  ease = 'power3.out',
-  parallax = 0.5,
-  tilt = 8,
-  stagger = 0.06,
-  trigger = 'hover',
-  showLabels = true,
-  grayscale = true,
-  className = ''
-}) => {
-  const rootRef = useRef(null);
-  const panelRefs = useRef([]);
-  const mediaRefs = useRef([]);
-  const barRefs = useRef([]);
-  const textRefs = useRef([]);
-  const tlRef = useRef(null);
-  const firstRunRef = useRef(true);
-  const mediaSizeRef = useRef(320);
+function createPanel(item) {
+  const panel = document.createElement('div');
+  panel.className = 'ag-panel';
+  panel.setAttribute('role', 'listitem');
+  panel.setAttribute('aria-label', item.label);
 
-  const vertical = orientation === 'vertical';
-  const count = items.length;
-  const [active, setActive] = useState(Math.min(Math.max(defaultIndex, 0), count - 1));
+  const image = document.createElement('img');
+  image.src = item.image;
+  image.alt = item.label;
+  image.draggable = false;
+  const media = document.createElement('span');
+  media.className = 'ag-panel__media';
+  media.append(image);
+  const overlay = document.createElement('span');
+  overlay.className = 'ag-panel__overlay';
+  const frame = document.createElement('span');
+  frame.className = 'ag-panel__frame';
+  frame.append(media, overlay);
 
-  const prefersReduced =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false;
+  const text = document.createElement('span');
+  text.className = 'ag-panel__text';
+  text.textContent = item.label;
+  const label = document.createElement('span');
+  label.className = 'ag-panel__label';
+  label.setAttribute('aria-hidden', 'true');
+  label.append(text);
 
-  const applyLayout = useCallback(
-    animate => {
-      const panels = panelRefs.current;
-      if (!panels.length) return;
+  panel.append(frame, label);
+  return panel;
+}
 
-      const r = Math.min(Math.max(expandRatio, 0.2), 0.9);
-      const grow = count > 1 ? (r * (count - 1)) / (1 - r) : 1;
-      const mediaSize = mediaSizeRef.current;
+function initGallery(root) {
+  const count = ITEMS.length;
+  const ratio = Math.min(Math.max(EXPAND_RATIO, 0.2), 0.9);
+  const panels = ITEMS.map(createPanel);
+  let active = DEFAULT_INDEX;
+  let mediaSize = 320;
 
-      tlRef.current?.kill();
-      const dur = animate && !prefersReduced ? duration : 0;
-      const tl = gsap.timeline();
+  // Flex-grow that makes the open panel take `ratio` of the width.
+  root.style.setProperty('--ag-gap', `${GAP}px`);
+  root.style.setProperty('--ag-grow', String((ratio * (count - 1)) / (1 - ratio)));
+  root.replaceChildren(...panels);
 
-      panels.forEach((panel, i) => {
-        if (!panel) return;
-        const isActive = i === active;
-        const media = mediaRefs.current[i];
-        const bar = barRefs.current[i];
-        const text = textRefs.current[i];
+  function setActive(index) {
+    active = index;
+    panels.forEach((panel, i) => {
+      const isActive = i === active;
+      panel.classList.toggle('ag-panel--active', isActive);
+      panel.tabIndex = isActive ? 0 : -1; // only the open panel is a Tab stop
+      if (isActive) panel.setAttribute('aria-current', 'true');
+      else panel.removeAttribute('aria-current');
 
-        const rot = isActive ? 0 : i < active ? tilt : -tilt;
-        const rotProp = vertical ? { rotateX: -rot } : { rotateY: rot };
+      // Closed panels tilt away from the open one, and their photos drift slightly.
+      const rotation = isActive ? 0 : i < active ? TILT : -TILT;
+      const drift = Math.max(-1.5, Math.min(1.5, active - i));
+      panel.style.setProperty('--ag-rot', `${rotation}deg`);
+      panel.style.setProperty('--ag-shift', isActive ? '0px' : `${drift * PARALLAX * mediaSize * 0.06}px`);
+    });
+  }
 
-        tl.to(panel, { flexGrow: isActive ? grow : 1, ...rotProp, duration: dur, ease }, 0);
+  panels.forEach((panel, i) => {
+    panel.addEventListener('mouseenter', () => setActive(i));
+    panel.addEventListener('click', () => setActive(i)); // touch screens have no hover
+    panel.addEventListener('focus', () => setActive(i));
+    panel.addEventListener('keydown', event => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+      if (!step) return;
+      event.preventDefault();
+      panels[(i + step + count) % count].focus(); // the focus event opens that panel
+    });
+  });
 
-        if (media) {
-          const drift = Math.max(-1.5, Math.min(1.5, active - i));
-          const shift = drift * parallax * mediaSize * 0.06;
-          const gray = grayscale ? (isActive ? 0 : 1) : 0;
-          tl.to(
-            media,
-            {
-              xPercent: -50,
-              yPercent: -50,
-              x: vertical ? 0 : isActive ? 0 : shift,
-              y: vertical ? (isActive ? 0 : shift) : 0,
-              '--ag-gray': gray,
-              '--ag-dim': isActive ? 0 : 0.35,
-              duration: dur,
-              ease
-            },
-            0
-          );
-        }
+  // Photos keep a width proportional to the gallery so they slide instead of stretching.
+  new ResizeObserver(() => {
+    const usable = Math.max(root.getBoundingClientRect().width - GAP * (count - 1), 120);
+    mediaSize = Math.max(140, usable * ratio * 1.22);
+    root.style.setProperty('--ag-media-size', `${mediaSize}px`);
+    setActive(active);
+  }).observe(root);
 
-        if (showLabels && bar && text) {
-          if (isActive) {
-            tl.to([bar, text], { opacity: 1, x: 0, duration: dur, ease, stagger: prefersReduced ? 0 : stagger }, 0);
-          } else {
-            tl.to([bar, text], { opacity: 0, x: -14, duration: dur * 0.6, ease }, 0);
-          }
-        }
-      });
+  setActive(active);
+}
 
-      tlRef.current = tl;
-    },
-    [
-      active,
-      count,
-      expandRatio,
-      duration,
-      ease,
-      vertical,
-      tilt,
-      parallax,
-      grayscale,
-      showLabels,
-      stagger,
-      prefersReduced
-    ]
-  );
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-
-    const measure = () => {
-      const rect = el.getBoundingClientRect();
-      const total = vertical ? rect.height : rect.width;
-      const usable = Math.max(total - gap * (count - 1), 120);
-      const size = Math.max(140, usable * Math.min(Math.max(expandRatio, 0.2), 0.9) * 1.22);
-      mediaSizeRef.current = size;
-      el.style.setProperty('--ag-media-size', `${size}px`);
-      applyLayout(!firstRunRef.current);
-    };
-
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [applyLayout, gap, count, expandRatio, vertical]);
-
-  useEffect(() => {
-    applyLayout(!firstRunRef.current);
-    firstRunRef.current = false;
-  }, [applyLayout]);
-
-  useEffect(
-    () => () => {
-      tlRef.current?.kill();
-    },
-    []
-  );
-
-  const handleEnter = i => {
-    if (trigger === 'hover') setActive(i);
-  };
-
-  const handleClick = (i, e) => {
-    if (i !== active) {
-      e.preventDefault();
-      setActive(i);
-    }
-  };
-
-  const handleKeyDown = (i, e) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActive((i + 1) % count);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActive((i - 1 + count) % count);
-    }
-  };
-
-  return (
-    <div
-      ref={rootRef}
-      className={`accordion-gallery${vertical ? ' accordion-gallery--vertical' : ''}${className ? ` ${className}` : ''}`}
-      style={{
-        '--ag-accent': accentColor,
-        '--ag-overlay': overlayColor,
-        '--ag-text': textColor,
-        '--ag-gap': `${gap}px`,
-        '--ag-radius': `${radius}px`,
-        height: vertical ? `${Math.round(height * 1.6)}px` : `${height}px`
-      }}
-      role="list"
-      aria-label="Image accordion gallery"
-    >
-      {items.map((item, i) => {
-        const isActive = i === active;
-        const Tag = item.link ? 'a' : 'div';
-        return (
-          <Tag
-            key={i}
-            ref={el => (panelRefs.current[i] = el)}
-            className={`ag-panel${isActive ? ' ag-panel--active' : ''}`}
-            style={{ borderRadius: `${radius}px` }}
-            href={item.link || undefined}
-            onClick={e => handleClick(i, e)}
-            onMouseEnter={() => handleEnter(i)}
-            onFocus={() => setActive(i)}
-            onKeyDown={e => handleKeyDown(i, e)}
-            role="listitem"
-            tabIndex={0}
-            aria-current={isActive ? 'true' : undefined}
-            aria-label={item.label}
-          >
-            <span className="ag-panel__frame">
-              <span className="ag-panel__media" ref={el => (mediaRefs.current[i] = el)}>
-                <img src={item.image} alt={item.alt || item.label || ''} draggable="false" />
-              </span>
-              <span className="ag-panel__overlay" aria-hidden="true" />
-            </span>
-            {showLabels && (
-              <span className="ag-panel__label" aria-hidden="true">
-                <span className="ag-panel__bar" ref={el => (barRefs.current[i] = el)} />
-                <span className="ag-panel__text" ref={el => (textRefs.current[i] = el)}>
-                  {item.label}
-                </span>
-              </span>
-            )}
-          </Tag>
-        );
-      })}
-    </div>
-  );
-};
-
-export default AccordionGallery;
+const gallery = document.getElementById('hotel-gallery');
+if (gallery) initGallery(gallery);
