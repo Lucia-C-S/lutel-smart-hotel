@@ -4,11 +4,5 @@
     "roomId": "102",
     "type": "noise",
     "label": "noise3"
-  },
-  {
-    "id": "h",
-    "roomId": "101",
-    "type": "panic-button",
-    "label": "j"
   }
 ]

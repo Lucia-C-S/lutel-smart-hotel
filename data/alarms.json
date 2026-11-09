@@ -22,5 +22,13 @@
     "message": "Noise 70 dB(A) meets or exceeds the 65 dB(A) threshold.",
     "timestamp": "2026-11-07T18:23:56.363Z",
     "acknowledged": true
+  },
+  {
+    "alarmId": "alarm-b118bf33-7e66-4610-889f-449f7921382f",
+    "deviceId": "dev",
+    "type": "high-noise",
+    "message": "Noise 70 dB(A) meets or exceeds the 65 dB(A) threshold.",
+    "timestamp": "2026-11-08T17:51:35.062Z",
+    "acknowledged": true
   }
 ]

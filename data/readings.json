@@ -3,5 +3,10 @@
     "deviceId": "dev",
     "timestamp": "2026-11-07T18:23:56.363Z",
     "value": 70
+  },
+  {
+    "deviceId": "dev",
+    "timestamp": "2026-11-08T17:51:35.062Z",
+    "value": 70
   }
 ]
